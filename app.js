@@ -81,12 +81,25 @@ app.get('/single-blog', (req, res) => {
 app.get('/', (req, res) => {
   // res.send('<h1>Giffari Alfarizy page</h1>');
   // res.sendFile('./views/index.html', { root: __dirname });
-  const blogs = [
-    { title: 'Yoshi find eggs', snippet: 'lorem ipsum dolor' },
-    { title: 'Mario find stars', snippet: 'loreng ipzum dolar' },
-    { title: 'How to defeat bowser', snippet: ':tada:' },
-  ];
-  res.render('index', { title: 'Home', blogs });
+
+  // const blogs = [
+  //   { title: 'Yoshi find eggs', snippet: 'lorem ipsum dolor' },
+  //   { title: 'Mario find stars', snippet: 'loreng ipzum dolar' },
+  //   { title: 'How to defeat bowser', snippet: ':tada:' },
+  // ];
+  // res.render('index', { title: 'Home', blogs });
+  res.redirect('/blogs');
+});
+
+app.get('/blogs', (req, res) => {
+  Blog.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.render('index', { title: 'Home', blogs: result });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 // app.use((req, res, next) => {
