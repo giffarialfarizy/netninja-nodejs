@@ -29,25 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // mongoose and mongo sandbox routes
-// save new blog
-app.get('/add-blog', (req, res) => {
-  const blog = new Blog({
-    title: 'another new blog',
-    snippet: 'about my new blog',
-    body: 'more about my new blog',
-  });
 
-  blog
-    .save()
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-// find All
+// API untuk semua blog?
 app.get('/all-blogs', (req, res) => {
   Blog.find()
     .then((result) => {
@@ -58,23 +41,12 @@ app.get('/all-blogs', (req, res) => {
     });
 });
 
-// find by ID
-app.get('/single-blog', (req, res) => {
-  Blog.findById('618f3b8bfaadbddadfefb9ef')
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-// routes
+// redirect
 app.get('/', (req, res) => {
   res.redirect('/blogs');
 });
 
-// blogs routes
+// GET all
 app.get('/blogs', (req, res) => {
   Blog.find()
     .sort({ createdAt: -1 })
@@ -86,7 +58,7 @@ app.get('/blogs', (req, res) => {
     });
 });
 
-// GET all
+// POST request
 app.post('/blogs', (req, res) => {
   const blog = new Blog(req.body);
 
