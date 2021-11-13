@@ -23,17 +23,9 @@ mongoose
 // register view engine
 app.set('view engine', 'ejs');
 
-// app.use((req, res, next) => {
-//   console.log('new request made: ');
-//   console.log('host: ', req.hostname);
-//   console.log('path: ', req.path);
-//   console.log('method: ', req.method);
-//   // console.log(req);
-//   next();
-// });
-
 // middleware & static files
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // mongoose and mongo sandbox routes
@@ -79,18 +71,10 @@ app.get('/single-blog', (req, res) => {
 
 // routes
 app.get('/', (req, res) => {
-  // res.send('<h1>Giffari Alfarizy page</h1>');
-  // res.sendFile('./views/index.html', { root: __dirname });
-
-  // const blogs = [
-  //   { title: 'Yoshi find eggs', snippet: 'lorem ipsum dolor' },
-  //   { title: 'Mario find stars', snippet: 'loreng ipzum dolar' },
-  //   { title: 'How to defeat bowser', snippet: ':tada:' },
-  // ];
-  // res.render('index', { title: 'Home', blogs });
   res.redirect('/blogs');
 });
 
+// blogs routes
 app.get('/blogs', (req, res) => {
   Blog.find()
     .sort({ createdAt: -1 })
@@ -102,23 +86,57 @@ app.get('/blogs', (req, res) => {
     });
 });
 
-// app.use((req, res, next) => {
-//   console.log('in the next middleware');
-//   next();
-// });
+// GET all
+app.post('/blogs', (req, res) => {
+  const blog = new Blog(req.body);
+
+  blog
+    .save()
+    .then((result) => {
+      res.redirect('/blogs');
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+// GET by id
+app.get('/blogs/:id', (req, res) => {
+  const id = req.params.id;
+  Blog.findById(id)
+    .then((result) => {
+      res.render('details', { title: 'Blog Details', blog: result });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+// DELETE request
+app.delete('/blogs/:id', (req, res) => {
+  const id = req.params.id;
+
+  Blog.findByIdAndDelete(id)
+    .then((result) => {
+      res.json({
+        redirect: '/blogs',
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 app.get('/about', (req, res) => {
-  // res.send('<h1>About page</h1>');
-  // res.sendFile('./views/about.html', { root: __dirname });
   res.render('about', { title: 'About' });
 });
 
 app.get('/blogs/create', (req, res) => {
   res.render('create', { title: 'Create' });
 });
+
 // 404 page
 // if it did not find match
 app.use((req, res) => {
-  // res.status(404).sendFile('./views/404.html', { root: __dirname });
   res.status(404).render('404', { title: '404' });
 });
